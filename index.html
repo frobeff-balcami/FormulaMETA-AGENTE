@@ -349,7 +349,13 @@
     <div class="success-title">¡Solicitud registrada!</div>
     <div class="success-desc">Tu requerimiento fue guardado en Google Sheets.<br>El área de IA Interna te contactará pronto.</div>
     <div class="summary-card" id="successSummary"></div>
-    <button class="copy-btn" onclick="copySummary()">Copiar resumen al portapapeles</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
+      <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
+      <button class="btn-next" onclick="restart()" style="display:flex;align-items:center;gap:8px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 018-8v2m0-2l3 3-3 3M20 12a8 8 0 01-8 8v-2m0 2l-3-3 3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Nueva solicitud
+      </button>
+    </div>
   </div>
 
   <!-- ERROR -->
@@ -526,6 +532,21 @@
       document.getElementById('errorBlock').style.display = 'block';
       document.getElementById('errorDetail').textContent = 'Error: ' + err.message;
     }
+  }
+
+  function restart() {
+    // Reset estado
+    Object.keys(D).forEach(k => delete D[k]);
+    // Limpiar inputs
+    document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+    document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('.chip2.sel, .chip-pill.sel').forEach(el => el.classList.remove('sel'));
+    document.querySelectorAll('.prio-btn').forEach(el => el.className = 'prio-btn');
+    // Ocultar success
+    document.getElementById('successBlock').style.display = 'none';
+    // Mostrar paso 1
+    document.getElementById('s1').classList.add('active');
+    updateProgress(1);
   }
 
   function copySummary() {
