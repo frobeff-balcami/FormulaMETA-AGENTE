@@ -3,384 +3,984 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solicitud de Asistente IA — Balcami</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>KYRO — IA Interna Balcami</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #0f1117; color: #e8eaf0; min-height: 100vh; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .top-header {
+    :root {
+      --blue: #388bfd;
+      --blue-light: #79b8ff;
+      --blue-dim: rgba(56,139,253,0.15);
+      --cyan: #4fc3f7;
+      --bg: #04111f;
+      --bg2: #081c34;
+      --bg3: #0d2442;
+      --text: #e8f4ff;
+      --text-muted: rgba(232,244,255,0.5);
+      --text-dim: rgba(232,244,255,0.25);
+      --border: rgba(56,139,253,0.15);
+      --border-hover: rgba(56,139,253,0.35);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GLOWS ── */
+    .glow { position: fixed; pointer-events: none; z-index: 0; border-radius: 50%; }
+    .glow1 { top: -150px; left: -100px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(56,139,253,0.12) 0%, transparent 70%); }
+    .glow2 { top: 300px; right: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(79,195,247,0.08) 0%, transparent 70%); }
+    .glow3 { bottom: -100px; left: 30%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(56,139,253,0.06) 0%, transparent 70%); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: rgba(4,17,31,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 800;
+      letter-spacing: -0.5px; color: #fff;
+    }
+    .nav-logo span { color: var(--blue); }
+
+    .nav-links { display: flex; gap: 2rem; font-size: 13px; color: var(--text-muted); }
+    .nav-links a { color: inherit; text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--blue); color: #fff;
+      border: none; padding: 9px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .nav-cta:hover { background: #1a6fe0; }
+    .nav-cta:active { transform: scale(0.97); }
+
+    /* ── HERO ── */
+    #home {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      padding-top: 80px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      padding: 5rem 2.5rem 3rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(56,139,253,0.08);
+      border: 0.5px solid rgba(56,139,253,0.25);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 12px; color: var(--blue-light);
+      margin-bottom: 1.75rem; width: fit-content;
+    }
+    .hero-tag-dot {
+      width: 6px; height: 6px;
+      background: var(--blue); border-radius: 50%;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(40px, 5vw, 60px);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -2px; color: #fff;
+      margin-bottom: 1.25rem;
+    }
+    h1 em { font-style: normal; color: var(--blue); }
+
+    .hero-sub {
+      font-size: 16px; color: var(--text-muted);
+      line-height: 1.75; max-width: 480px;
+      margin-bottom: 2.25rem; font-weight: 300;
+    }
+
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      border: none; padding: 13px 30px;
+      border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #1a6fe0; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      background: transparent; color: var(--text-muted);
+      border: 0.5px solid rgba(232,244,255,0.15);
+      padding: 13px 24px; border-radius: var(--radius-sm);
+      font-size: 14px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(232,244,255,0.3); }
+
+    /* ── FLOATING CARDS ── */
+    .hero-right {
+      position: relative;
+      padding-top: 80px;
+    }
+
+    .fcard {
+      position: absolute;
+      background: rgba(8,28,52,0.88);
+      border: 0.5px solid var(--border);
+      border-radius: 16px; padding: 1rem 1.25rem;
+      backdrop-filter: blur(16px);
+      transition: border-color 0.3s;
+    }
+    .fcard:hover { border-color: var(--border-hover); }
+
+    .fc1 { top: 60px; right: 30px; width: 225px; animation: floatA 6s ease-in-out infinite; }
+    .fc2 { top: 210px; right: 265px; width: 185px; animation: floatB 7s ease-in-out infinite; }
+    .fc3 { top: 330px; right: 20px; width: 240px; animation: floatA 8s ease-in-out infinite 1s; }
+    .fc4 { top: 500px; right: 170px; width: 205px; animation: floatB 6.5s ease-in-out infinite 0.5s; }
+
+    @keyframes floatA { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+    @keyframes floatB { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+    .fc-tag { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-light); margin-bottom: 8px; }
+    .fc-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .fc-area { display: inline-block; background: var(--blue-dim); color: var(--blue-light); font-size: 10px; padding: 2px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .fc-bar { height: 3px; background: rgba(56,139,253,0.12); border-radius: 2px; margin-bottom: 4px; }
+    .fc-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .fc-stat { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); }
+
+    .fc-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--blue-dim); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .fc-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+    .fc-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: #fff; }
+    .fc-sub { font-size: 11px; color: var(--cyan); margin-top: 2px; }
+
+    .fc-list-head { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .fc-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid rgba(56,139,253,0.08); }
+    .fc-item:last-child { border-bottom: none; }
+    .fc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .fc-name { font-size: 12px; color: var(--text); flex: 1; }
+    .fc-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+    .b-active { background: rgba(79,195,247,0.12); color: var(--cyan); }
+    .b-done { background: var(--blue-dim); color: var(--blue-light); }
+    .b-pending { background: rgba(232,244,255,0.04); color: var(--text-dim); }
+
+    /* ── STATS ── */
+    .stats-strip {
+      position: relative; z-index: 2;
+      display: flex; gap: 0;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      background: rgba(8,28,52,0.4);
+    }
+    .stat-item {
+      flex: 1; padding: 2rem 2.5rem;
+      border-right: 0.5px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px; font-weight: 700; color: #fff;
+    }
+    .stat-num span { color: var(--blue); }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── AGENTS SECTION ── */
+    #agentes {
+      position: relative; z-index: 2;
+      padding: 5rem 2.5rem;
+    }
+
+    .section-eyebrow {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--blue-light); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px; font-weight: 700;
+      color: #fff; margin-bottom: 0.75rem;
+      letter-spacing: -1px;
+    }
+    .section-sub {
+      font-size: 15px; color: var(--text-muted);
+      max-width: 480px; line-height: 1.7;
+      margin-bottom: 3rem; font-weight: 300;
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .agent-card {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .agent-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+    .ac-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .ac-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ac-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: #fff; }
+    .ac-area { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .ac-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+    .ac-footer { display: flex; align-items: center; justify-content: space-between; }
+    .ac-tag { font-size: 10px; padding: 3px 10px; border-radius: 20px; background: var(--blue-dim); color: var(--blue-light); }
+    .ac-status { font-size: 10px; display: flex; align-items: center; gap: 4px; color: var(--cyan); }
+    .ac-status-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; }
+
+    /* ── MODAL OVERLAY ── */
+    #formModal {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(4,17,31,0.92);
+      backdrop-filter: blur(8px);
+      overflow-y: auto;
+      padding: 2rem 1rem;
+    }
+    #formModal.open { display: flex; align-items: flex-start; justify-content: center; }
+
+    .modal-inner {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 20px;
+      width: 100%; max-width: 600px;
+      overflow: hidden;
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+    .modal-header {
       background: linear-gradient(135deg, #1a2a6c 0%, #1565c0 60%, #1976d2 100%);
       padding: 1.5rem 1.75rem 1.75rem;
       position: relative; overflow: hidden;
     }
-    .top-header::before {
+    .modal-header::before {
       content: ''; position: absolute; top: -40px; right: -40px;
-      width: 180px; height: 180px; background: rgba(255,255,255,0.06); border-radius: 50%;
+      width: 180px; height: 180px;
+      background: rgba(255,255,255,0.06); border-radius: 50%;
     }
-    .badge { display: inline-block; background: rgba(255,255,255,0.18); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; padding: 4px 10px; border-radius: 4px; margin-bottom: 0.75rem; }
-    .header-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .header-sub { font-size: 13px; color: rgba(255,255,255,0.72); margin-bottom: 1.25rem; }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,0.1); border: none;
+      color: rgba(255,255,255,0.7); width: 32px; height: 32px;
+      border-radius: 8px; cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.2); }
+    .modal-badge { display: inline-block; background: rgba(255,255,255,0.18); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; padding: 4px 10px; border-radius: 4px; margin-bottom: 0.75rem; }
+    .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .modal-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 1.25rem; }
+
     .progress-wrap { display: flex; align-items: center; gap: 10px; }
-    .progress-track { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+    .progress-track { flex: 1; height: 4px; background: rgba(255,255,255,0.18); border-radius: 2px; overflow: hidden; }
     .progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width 0.4s ease; }
     .progress-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); white-space: nowrap; }
 
-    .body { padding: 1.75rem 1.75rem 2.5rem; background: #161b27; min-height: calc(100vh - 160px); max-width: 640px; margin: 0 auto; }
+    .modal-body { padding: 1.75rem 1.75rem 2rem; }
 
+    /* ── FORM STEPS ── */
     .step-block { display: none; }
     .step-block.active { display: block; animation: fadeUp 0.3s ease both; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
 
-    .section-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #5b9bd5; text-transform: uppercase; margin-bottom: 0.5rem; }
-    .step-q { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; }
-    .step-hint { font-size: 13px; color: #8892a4; margin-bottom: 1.5rem; line-height: 1.5; }
-    .field-label { font-size: 13px; font-weight: 600; color: #c8cfdc; display: block; margin-bottom: 8px; }
-    .field-group { margin-bottom: 1.4rem; }
+    .section-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #5b9bd5; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .step-q { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 5px; line-height: 1.3; }
+    .step-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.55; }
+    .field-label { font-size: 13px; font-weight: 500; color: #c8cfdc; display: block; margin-bottom: 7px; }
+    .field-group { margin-bottom: 1.3rem; }
 
     input[type="text"], textarea, select {
-      width: 100%; background: #1e2535; border: 1px solid #2e3a50; border-radius: 8px;
-      color: #e8eaf0; font-family: 'Inter', sans-serif; font-size: 14px;
-      padding: 11px 14px; outline: none; transition: border-color 0.2s;
+      width: 100%; background: rgba(4,17,31,0.6);
+      border: 0.5px solid rgba(56,139,253,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; padding: 11px 14px; outline: none;
+      transition: border-color 0.2s;
     }
-    input[type="text"]::placeholder, textarea::placeholder { color: #4a5568; }
-    input[type="text"]:focus, textarea:focus, select:focus { border-color: #3b82f6; }
-    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    input[type="text"]::placeholder, textarea::placeholder { color: rgba(232,244,255,0.2); }
+    input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(56,139,253,0.1); }
+    textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
     select { appearance: none; cursor: pointer; }
-    select option { background: #1e2535; }
+    select option { background: #081c34; }
 
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .chip2 { padding: 12px 14px; background: #1e2535; border: 1px solid #2e3a50; border-radius: 8px; font-size: 13px; font-weight: 500; color: #c8cfdc; cursor: pointer; transition: all 0.15s; text-align: left; user-select: none; }
-    .chip2:hover { border-color: #3b82f6; color: #fff; }
-    .chip2.sel { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; font-weight: 600; }
+    .chip2 {
+      padding: 11px 14px; background: rgba(4,17,31,0.5);
+      border: 0.5px solid rgba(56,139,253,0.18);
+      border-radius: var(--radius-sm); font-size: 13px;
+      color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+      user-select: none;
+    }
+    .chip2:hover { border-color: var(--blue); color: #fff; }
+    .chip2.sel { background: rgba(56,139,253,0.12); border-color: var(--blue); color: var(--blue-light); font-weight: 500; }
 
     .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip-pill { padding: 8px 16px; background: #1e2535; border: 1px solid #2e3a50; border-radius: 20px; font-size: 13px; color: #c8cfdc; cursor: pointer; transition: all 0.15s; user-select: none; }
-    .chip-pill:hover { border-color: #3b82f6; color: #fff; }
-    .chip-pill.sel { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; font-weight: 600; }
+    .chip-pill {
+      padding: 7px 16px; background: rgba(4,17,31,0.5);
+      border: 0.5px solid rgba(56,139,253,0.18);
+      border-radius: 20px; font-size: 12px;
+      color: var(--text-muted); cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .chip-pill:hover { border-color: var(--blue); color: #fff; }
+    .chip-pill.sel { background: rgba(56,139,253,0.12); border-color: var(--blue); color: var(--blue-light); font-weight: 500; }
 
     .prio-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-    .prio-btn { padding: 12px; border-radius: 8px; border: 1px solid #2e3a50; background: #1e2535; color: #c8cfdc; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; font-family: 'Inter', sans-serif; transition: all 0.15s; }
-    .prio-btn.alta { background: #3b1111; border-color: #e53e3e; color: #fc8181; }
-    .prio-btn.media { background: #3b2700; border-color: #d97706; color: #fcd34d; }
-    .prio-btn.baja { background: #0d3322; border-color: #059669; color: #6ee7b7; }
+    .prio-btn {
+      padding: 11px; border-radius: var(--radius-sm);
+      border: 0.5px solid rgba(56,139,253,0.18);
+      background: rgba(4,17,31,0.5); color: var(--text-muted);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      text-align: center; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    .prio-btn.alta { background: rgba(59,17,17,0.6); border-color: #e53e3e; color: #fc8181; }
+    .prio-btn.media { background: rgba(59,39,0,0.6); border-color: #d97706; color: #fcd34d; }
+    .prio-btn.baja { background: rgba(13,51,34,0.6); border-color: #059669; color: #6ee7b7; }
 
-    .nav-row { display: flex; gap: 10px; margin-top: 2rem; align-items: center; }
-    .btn-next { padding: 11px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s; }
-    .btn-next:hover { background: #1e40af; }
-    .btn-back { padding: 11px 18px; background: transparent; color: #8892a4; border: 1px solid #2e3a50; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
-    .btn-back:hover { color: #e8eaf0; border-color: #4a5568; }
-    .btn-submit { padding: 11px 28px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px; }
-    .btn-submit:hover { background: #047857; }
+    .nav-row { display: flex; gap: 10px; margin-top: 1.75rem; align-items: center; }
+    .f-btn-next {
+      padding: 11px 26px; background: var(--blue); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: background 0.2s, transform 0.1s;
+    }
+    .f-btn-next:hover { background: #1a6fe0; }
+    .f-btn-next:active { transform: scale(0.98); }
+    .f-btn-back {
+      padding: 11px 18px; background: transparent;
+      color: var(--text-muted); border: 0.5px solid rgba(232,244,255,0.1);
+      border-radius: var(--radius-sm); font-size: 14px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    .f-btn-back:hover { color: var(--text); border-color: rgba(232,244,255,0.25); }
+    .f-btn-submit {
+      padding: 11px 28px; background: #059669; color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 8px; transition: background 0.2s;
+    }
+    .f-btn-submit:hover { background: #047857; }
 
-    .err { color: #fc8181; font-size: 12px; margin-top: 6px; display: none; }
+    .err { color: #fc8181; font-size: 12px; margin-top: 5px; display: none; }
 
-    .summary-card { background: #1e2535; border: 1px solid #2e3a50; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; }
-    .srow { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #2e3a50; font-size: 13px; gap: 16px; }
+    .summary-card {
+      background: rgba(4,17,31,0.5); border: 0.5px solid rgba(56,139,253,0.15);
+      border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem;
+    }
+    .srow {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 6px 0; border-bottom: 0.5px solid rgba(56,139,253,0.08);
+      font-size: 12px; gap: 16px;
+    }
     .srow:last-child { border-bottom: none; }
-    .sk { color: #6b7a99; flex-shrink: 0; }
-    .sv { color: #e8eaf0; font-weight: 500; text-align: right; font-size: 12px; }
+    .sk { color: var(--text-muted); flex-shrink: 0; }
+    .sv { color: var(--text); font-weight: 500; text-align: right; }
+
+    .sheets-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(13,51,34,0.5); border: 0.5px solid #059669;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: #6ee7b7; font-weight: 500; margin-bottom: 1rem;
+    }
 
     .sending-state { text-align: center; padding: 3rem 1rem; }
-    .spinner { width: 40px; height: 40px; border: 3px solid #2e3a50; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid rgba(56,139,253,0.15);
+      border-top-color: var(--blue); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .sending-title { font-size: 15px; color: #c8cfdc; font-weight: 600; }
-    .sending-sub { font-size: 13px; color: #6b7a99; margin-top: 6px; }
+    .sending-title { font-size: 15px; color: #c8cfdc; font-weight: 500; }
+    .sending-sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
 
     .success-wrap { display: none; text-align: center; padding: 2.5rem 1rem; animation: fadeUp 0.4s ease both; }
-    .success-icon { width: 60px; height: 60px; background: #0d3322; border: 2px solid #059669; border-radius: 50%; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; }
-    .success-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-    .success-desc { font-size: 13px; color: #8892a4; line-height: 1.7; margin-bottom: 1.5rem; }
+    .success-icon {
+      width: 60px; height: 60px; background: rgba(13,51,34,0.6);
+      border: 1.5px solid #059669; border-radius: 50%;
+      margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center;
+    }
+    .success-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
 
-    .error-wrap { display: none; text-align: center; padding: 2.5rem 1rem; animation: fadeUp 0.4s ease both; }
-    .error-icon { width: 60px; height: 60px; background: #3b1111; border: 2px solid #e53e3e; border-radius: 50%; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; }
-    .error-title { font-size: 18px; font-weight: 700; color: #fc8181; margin-bottom: 8px; }
-    .error-desc { font-size: 13px; color: #8892a4; line-height: 1.7; margin-bottom: 1.5rem; }
+    .error-wrap { display: none; text-align: center; padding: 2.5rem 1rem; }
+    .error-title { font-size: 17px; font-weight: 600; color: #fc8181; margin-bottom: 8px; }
+    .error-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
 
-    .sheets-badge { display: inline-flex; align-items: center; gap: 6px; background: #0d3322; border: 1px solid #059669; border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #6ee7b7; font-weight: 600; margin-bottom: 1rem; }
-    .copy-btn { padding: 9px 22px; border: 1px solid #2e3a50; border-radius: 8px; background: transparent; color: #8892a4; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; margin-top: 10px; }
-    .copy-btn:hover { border-color: #4a5568; color: #e8eaf0; }
-    .retry-btn { padding: 10px 24px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .copy-btn {
+      padding: 9px 20px; border: 0.5px solid rgba(232,244,255,0.12);
+      border-radius: var(--radius-sm); background: transparent;
+      color: var(--text-muted); font-size: 13px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    .copy-btn:hover { border-color: rgba(232,244,255,0.25); color: var(--text); }
+    .retry-btn {
+      padding: 10px 24px; background: var(--blue); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    }
 
-    @media (max-width: 480px) {
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 2;
+      border-top: 0.5px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; color: var(--text-dim);
+    }
+    .footer-logo { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: rgba(232,244,255,0.3); }
+    .footer-logo span { color: rgba(56,139,253,0.5); }
+
+    @media (max-width: 768px) {
+      #home { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .stats-strip { flex-wrap: wrap; }
+      .stat-item { border-right: none; border-bottom: 0.5px solid var(--border); }
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      .hero-left { padding: 3rem 1.25rem 2rem; }
+      #agentes { padding: 3rem 1.25rem; }
+      .modal-inner { border-radius: 16px; }
+      .modal-body { padding: 1.25rem; }
       .grid2 { grid-template-columns: 1fr; }
       .prio-grid { grid-template-columns: 1fr; }
-      .body { padding: 1.25rem 1rem 2rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="top-header">
-  <div class="badge">BALCAMI</div>
-  <div class="header-title">Solicitud de Asistente IA</div>
-  <div class="header-sub">Completá las preguntas para que podamos diseñar tu solución</div>
-  <div class="progress-wrap">
-    <div class="progress-track"><div class="progress-fill" id="pFill" style="width:14.28%"></div></div>
-    <div class="progress-label" id="pLabel">Paso 1 de 7</div>
+<!-- GLOWS -->
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+<div class="glow glow3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">KY<span>R</span>O</div>
+  <div class="nav-links">
+    <a href="#agentes">Agentes</a>
+    <a href="#agentes">Proyectos</a>
+    <a href="#" onclick="openForm()">Solicitar</a>
+  </div>
+  <button class="nav-cta" onclick="openForm()">Solicitar asistente</button>
+</nav>
+
+<!-- HOME -->
+<section id="home">
+  <div class="hero-left">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      IA Interna — Balcami
+    </div>
+    <h1>Automatizá.<br>Escalá. <em>Sin fricción.</em></h1>
+    <p class="hero-sub">KYRO conecta cada área de Balcami con asistentes de inteligencia artificial diseñados para su trabajo real. Sin código, sin demoras.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="openForm()">Solicitar un asistente</button>
+      <button class="btn-ghost" onclick="document.getElementById('agentes').scrollIntoView({behavior:'smooth'})">Ver agentes activos →</button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <!-- Card 1: solicitud activa -->
+    <div class="fcard fc1">
+      <div class="fc-tag">Solicitud activa</div>
+      <div class="fc-title">Analizador de OC</div>
+      <div class="fc-area">Logística</div>
+      <div class="fc-bar"><div class="fc-bar-fill" style="width:68%"></div></div>
+      <div class="fc-stat"><span>En desarrollo</span><span>68%</span></div>
+    </div>
+
+    <!-- Card 2: agentes activos -->
+    <div class="fcard fc2">
+      <div class="fc-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#388bfd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="fc-label">Agentes activos</div>
+      <div class="fc-val">7</div>
+      <div class="fc-sub">+2 este mes</div>
+    </div>
+
+    <!-- Card 3: lista agentes -->
+    <div class="fcard fc3">
+      <div class="fc-list-head">Agentes recientes</div>
+      <div class="fc-item">
+        <div class="fc-dot" style="background:#4fc3f7"></div>
+        <div class="fc-name">CV Scorer RRHH</div>
+        <div class="fc-badge b-active">Activo</div>
+      </div>
+      <div class="fc-item">
+        <div class="fc-dot" style="background:#388bfd"></div>
+        <div class="fc-name">Post-venta auto</div>
+        <div class="fc-badge b-done">Listo</div>
+      </div>
+      <div class="fc-item">
+        <div class="fc-dot" style="background:rgba(232,244,255,0.15)"></div>
+        <div class="fc-name">Reporte ventas</div>
+        <div class="fc-badge b-pending">Pendiente</div>
+      </div>
+    </div>
+
+    <!-- Card 4: sheets -->
+    <div class="fcard fc4" style="display:flex;align-items:center;gap:10px;">
+      <div class="fc-icon" style="flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#388bfd" stroke-width="2"/><path d="M3 9h18M9 9v12" stroke="#388bfd" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;">Sheets sincronizado</div>
+        <div style="font-size:11px;color:var(--text-muted);">Última entrada hace 3 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-num">7<span>+</span></div>
+    <div class="stat-label">Agentes en producción</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">4</div>
+    <div class="stat-label">Áreas integradas</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">23<span>h</span></div>
+    <div class="stat-label">Ahorradas por semana</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">12</div>
+    <div class="stat-label">Solicitudes procesadas</div>
   </div>
 </div>
 
-<div class="body">
+<!-- AGENTS -->
+<section id="agentes">
+  <div class="section-eyebrow">Agentes activos</div>
+  <div class="section-title">Lo que KYRO ya hace por Balcami</div>
+  <p class="section-sub">Cada agente fue construido a medida para un área específica. Hacé clic en "Solicitar asistente" para agregar el tuyo.</p>
 
-  <!-- PASO 1 -->
-  <div class="step-block active" id="s1">
-    <div class="section-tag">Identificación</div>
-    <div class="step-q">¿Quién hace la solicitud?</div>
-    <div class="step-hint">Estos datos nos permiten hacer el seguimiento y coordinar la implementación</div>
-    <div class="field-group">
-      <label class="field-label">Nombre completo</label>
-      <input type="text" id="f-nombre" placeholder="Tu nombre" />
-      <div class="err" id="e-nombre">Campo obligatorio.</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Área / Departamento</label>
-      <div class="grid2" id="g-area">
-        <div class="chip2" data-v="Logística">Logística</div>
-        <div class="chip2" data-v="Administración">Administración</div>
-        <div class="chip2" data-v="Ventas">Ventas</div>
-        <div class="chip2" data-v="Recursos Humanos">Recursos Humanos</div>
-        <div class="chip2" data-v="Post-venta">Post-venta</div>
-        <div class="chip2" data-v="Dirección">Dirección</div>
+  <div class="agents-grid">
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-icon" style="background:rgba(79,195,247,0.1);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">CV Scorer</div>
+          <div class="ac-area">Recursos Humanos</div>
+        </div>
       </div>
-      <div class="err" id="e-area">Seleccioná al menos un área.</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Rol dentro del área</label>
-      <select id="f-rol">
-        <option value="">Ej: Analista, Líder de área, Operario...</option>
-        <option>Operario</option>
-        <option>Analista</option>
-        <option>Líder de área</option>
-        <option>Jefe / Supervisor</option>
-        <option>Dirección / Gerencia</option>
-        <option>Otro</option>
-      </select>
-      <div class="err" id="e-rol">Seleccioná tu rol.</div>
-    </div>
-    <div class="nav-row"><button class="btn-next" onclick="next(1)">Siguiente →</button></div>
-  </div>
-
-  <!-- PASO 2 -->
-  <div class="step-block" id="s2">
-    <div class="section-tag">El problema</div>
-    <div class="step-q">¿Qué tarea o proceso querés automatizar?</div>
-    <div class="step-hint">Describilo como lo hacés hoy, sin pensar aún en la solución técnica</div>
-    <div class="field-group">
-      <label class="field-label">Descripción del proceso actual</label>
-      <textarea id="f-proceso" placeholder="Ej: Todos los días cargo manualmente los datos de recepciones en una planilla, luego los cruzo con las OC..."></textarea>
-      <div class="err" id="e-proceso">Describí el proceso aunque sea brevemente.</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">¿Con qué frecuencia se hace?</label>
-      <div class="grid2" id="g-frecuencia">
-        <div class="chip2" data-v="Varias veces al día">Varias veces al día</div>
-        <div class="chip2" data-v="Una vez al día">Una vez al día</div>
-        <div class="chip2" data-v="Semanal">Semanal</div>
-        <div class="chip2" data-v="Mensual o esporádico">Mensual o esporádico</div>
+      <div class="ac-desc">Analiza CVs automáticamente y genera un score de adecuación al puesto con dashboard de visualización.</div>
+      <div class="ac-footer">
+        <div class="ac-tag">RRHH</div>
+        <div class="ac-status"><span class="ac-status-dot"></span>Activo</div>
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">¿Cuánto tiempo consume?</label>
-      <div class="chip-row" id="g-tiempo">
-        <div class="chip-pill" data-v="Menos de 30 min">Menos de 30 min</div>
-        <div class="chip-pill" data-v="30 min – 1 hora">30 min – 1 hora</div>
-        <div class="chip-pill" data-v="1 a 3 horas">1 a 3 horas</div>
-        <div class="chip-pill" data-v="Más de 3 horas">Más de 3 horas</div>
+
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-icon" style="background:rgba(56,139,253,0.1);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="#388bfd" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">Reporte Admin</div>
+          <div class="ac-area">Administración</div>
+        </div>
+      </div>
+      <div class="ac-desc">Genera indicadores desde Excel/Sheets con definición libre por el usuario. Sin fórmulas manuales.</div>
+      <div class="ac-footer">
+        <div class="ac-tag">Administración</div>
+        <div class="ac-status"><span class="ac-status-dot"></span>Activo</div>
       </div>
     </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(2)">← Atrás</button>
-      <button class="btn-next" onclick="next(2)">Siguiente →</button>
-    </div>
-  </div>
 
-  <!-- PASO 3 -->
-  <div class="step-block" id="s3">
-    <div class="section-tag">El impacto actual</div>
-    <div class="step-q">¿Qué problemas genera este proceso hoy?</div>
-    <div class="step-hint">Marcá todo lo que aplique</div>
-    <div class="field-group">
-      <div class="chip-row" id="g-problemas">
-        <div class="chip-pill" data-v="Errores frecuentes">Errores frecuentes</div>
-        <div class="chip-pill" data-v="Demoras / cuellos de botella">Demoras / cuellos de botella</div>
-        <div class="chip-pill" data-v="Datos inconsistentes">Datos inconsistentes</div>
-        <div class="chip-pill" data-v="Falta de visibilidad">Falta de visibilidad</div>
-        <div class="chip-pill" data-v="Depende de una sola persona">Depende de una sola persona</div>
-        <div class="chip-pill" data-v="Alto consumo de tiempo">Alto consumo de tiempo</div>
-        <div class="chip-pill" data-v="No hay registro formal">No hay registro formal</div>
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-icon" style="background:rgba(79,195,247,0.08);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">Post-venta Auto</div>
+          <div class="ac-area">Post-venta</div>
+        </div>
+      </div>
+      <div class="ac-desc">Registro automático de clientes, mensajes automáticos y alertas de seguimiento a los 5 días.</div>
+      <div class="ac-footer">
+        <div class="ac-tag">Post-venta</div>
+        <div class="ac-status"><span class="ac-status-dot"></span>Activo</div>
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">¿Tenés alguna estimación del impacto? (opcional)</label>
-      <input type="text" id="f-impacto" placeholder="Ej: 2 horas por día, 1 error por semana..." />
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(3)">← Atrás</button>
-      <button class="btn-next" onclick="next(3)">Siguiente →</button>
-    </div>
-  </div>
 
-  <!-- PASO 4 -->
-  <div class="step-block" id="s4">
-    <div class="section-tag">La solución deseada</div>
-    <div class="step-q">¿Cómo sería el mundo ideal?</div>
-    <div class="step-hint">Si el asistente funcionara perfecto, ¿qué cambiaría en tu trabajo?</div>
-    <div class="field-group">
-      <label class="field-label">Resultado esperado</label>
-      <textarea id="f-resultado" placeholder="Ej: Que el reporte se genere solo, que me llegue una alerta cuando falta algo..."></textarea>
-      <div class="err" id="e-resultado">Contanos aunque sea una idea general.</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">¿Qué tipo de asistente necesitás?</label>
-      <div class="grid2" id="g-tipo">
-        <div class="chip2" data-v="Análisis y reportes automáticos">Análisis y reportes automáticos</div>
-        <div class="chip2" data-v="Registro automático de datos">Registro automático de datos</div>
-        <div class="chip2" data-v="Alertas y notificaciones">Alertas y notificaciones</div>
-        <div class="chip2" data-v="Evaluación o scoring">Evaluación o scoring</div>
-        <div class="chip2" data-v="Generación de mensajes">Generación de mensajes</div>
-        <div class="chip2" data-v="No sé aún">No sé aún</div>
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-icon" style="background:rgba(56,139,253,0.08);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#388bfd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">Score Ventas</div>
+          <div class="ac-area">Ventas</div>
+        </div>
+      </div>
+      <div class="ac-desc">Evalúa conversaciones comerciales y genera puntaje de cierre por vendedor automáticamente.</div>
+      <div class="ac-footer">
+        <div class="ac-tag">Ventas</div>
+        <div class="ac-status"><span class="ac-status-dot"></span>Activo</div>
       </div>
     </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(4)">← Atrás</button>
-      <button class="btn-next" onclick="next(4)">Siguiente →</button>
-    </div>
-  </div>
 
-  <!-- PASO 5 -->
-  <div class="step-block" id="s5">
-    <div class="section-tag">Herramientas y contexto</div>
-    <div class="step-q">¿Con qué herramientas trabaja tu área?</div>
-    <div class="step-hint">Marcá las que usás habitualmente</div>
-    <div class="field-group">
-      <div class="chip-row" id="g-herramientas">
-        <div class="chip-pill" data-v="Excel / Google Sheets">Excel / Google Sheets</div>
-        <div class="chip-pill" data-v="Odoo">Odoo</div>
-        <div class="chip-pill" data-v="WhatsApp">WhatsApp</div>
-        <div class="chip-pill" data-v="Email / Gmail">Email / Gmail</div>
-        <div class="chip-pill" data-v="App interna Balcami">App interna Balcami</div>
-        <div class="chip-pill" data-v="ClickUp">ClickUp</div>
-        <div class="chip-pill" data-v="Google Drive">Google Drive</div>
-        <div class="chip-pill" data-v="n8n">n8n</div>
-        <div class="chip-pill" data-v="Otra">Otra</div>
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-icon" style="background:rgba(79,195,247,0.08);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">Recepción MP</div>
+          <div class="ac-area">Logística</div>
+        </div>
+      </div>
+      <div class="ac-desc">Registro automático de materia prima desde OC. Control de recepción manual por operario.</div>
+      <div class="ac-footer">
+        <div class="ac-tag">Logística</div>
+        <div class="ac-status" style="color:var(--blue-light);"><span class="ac-status-dot" style="background:var(--blue-light)"></span>En desarrollo</div>
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">¿Cuántas personas usarían este asistente?</label>
-      <div class="chip-row" id="g-usuarios">
-        <div class="chip-pill" data-v="Solo yo">Solo yo</div>
-        <div class="chip-pill" data-v="2 a 5 personas">2 a 5 personas</div>
-        <div class="chip-pill" data-v="6 a 15 personas">6 a 15 personas</div>
-        <div class="chip-pill" data-v="Más de 15 personas">Más de 15 personas</div>
+
+    <!-- CTA card -->
+    <div class="agent-card" style="border-style:dashed;border-color:rgba(56,139,253,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;" onclick="openForm()">
+      <div style="width:40px;height:40px;border-radius:50%;border:0.5px dashed rgba(56,139,253,0.35);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#388bfd" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--blue-light);margin-bottom:6px;">Solicitar nuevo agente</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Completá el formulario y el área de IA lo diseña para vos.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">KY<span>R</span>O</div>
+  <div>IA Interna — Balcami © 2025</div>
+</footer>
+
+<!-- ═══════════════════════════════════════ MODAL FORM ═══════════════════════════════════════ -->
+<div id="formModal">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeForm()">×</button>
+      <div class="modal-badge">KYRO</div>
+      <div class="modal-title">Solicitud de Asistente IA</div>
+      <div class="modal-sub">Completá las preguntas para que podamos diseñar tu solución</div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="pFill" style="width:14.28%"></div></div>
+        <div class="progress-label" id="pLabel">Paso 1 de 7</div>
       </div>
     </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(5)">← Atrás</button>
-      <button class="btn-next" onclick="next(5)">Siguiente →</button>
-    </div>
-  </div>
 
-  <!-- PASO 6 -->
-  <div class="step-block" id="s6">
-    <div class="section-tag">Priorización</div>
-    <div class="step-q">¿Qué tan urgente es esta necesidad?</div>
-    <div class="step-hint">Esto nos ayuda a organizar el backlog de desarrollo</div>
-    <div class="field-group">
-      <label class="field-label">Prioridad</label>
-      <div class="prio-grid">
-        <button class="prio-btn" data-v="Alta" onclick="setPrio(this,'alta')">🔴 ALTA</button>
-        <button class="prio-btn" data-v="Media" onclick="setPrio(this,'media')">🟡 MEDIA</button>
-        <button class="prio-btn" data-v="Baja" onclick="setPrio(this,'baja')">🟢 BAJA</button>
+    <div class="modal-body">
+
+      <!-- PASO 1 -->
+      <div class="step-block active" id="s1">
+        <div class="section-tag">Identificación</div>
+        <div class="step-q">¿Quién hace la solicitud?</div>
+        <div class="step-hint">Estos datos nos permiten hacer el seguimiento y coordinar la implementación</div>
+        <div class="field-group">
+          <label class="field-label">Nombre completo</label>
+          <input type="text" id="f-nombre" placeholder="Tu nombre" />
+          <div class="err" id="e-nombre">Campo obligatorio.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Área / Departamento</label>
+          <div class="grid2" id="g-area">
+            <div class="chip2" data-v="Logística">Logística</div>
+            <div class="chip2" data-v="Administración">Administración</div>
+            <div class="chip2" data-v="Ventas">Ventas</div>
+            <div class="chip2" data-v="Recursos Humanos">Recursos Humanos</div>
+            <div class="chip2" data-v="Post-venta">Post-venta</div>
+            <div class="chip2" data-v="Dirección">Dirección</div>
+          </div>
+          <div class="err" id="e-area">Seleccioná al menos un área.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Rol dentro del área</label>
+          <select id="f-rol">
+            <option value="">Ej: Analista, Líder de área, Operario...</option>
+            <option>Operario</option>
+            <option>Analista</option>
+            <option>Líder de área</option>
+            <option>Jefe / Supervisor</option>
+            <option>Dirección / Gerencia</option>
+            <option>Otro</option>
+          </select>
+          <div class="err" id="e-rol">Seleccioná tu rol.</div>
+        </div>
+        <div class="nav-row"><button class="f-btn-next" onclick="next(1)">Siguiente →</button></div>
       </div>
-      <div class="err" id="e-prioridad">Seleccioná una prioridad.</div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">¿Ya existe algún intento de solución anterior?</label>
-      <div class="chip-row" id="g-previo">
-        <div class="chip-pill" data-v="No, es nuevo">No, es nuevo</div>
-        <div class="chip-pill" data-v="Hay algo manual pero no funciona bien">Hay algo manual</div>
-        <div class="chip-pill" data-v="Se intentó antes y no prosperó">Se intentó antes</div>
+
+      <!-- PASO 2 -->
+      <div class="step-block" id="s2">
+        <div class="section-tag">El problema</div>
+        <div class="step-q">¿Qué tarea o proceso querés automatizar?</div>
+        <div class="step-hint">Describilo como lo hacés hoy, sin pensar aún en la solución técnica</div>
+        <div class="field-group">
+          <label class="field-label">Descripción del proceso actual</label>
+          <textarea id="f-proceso" placeholder="Ej: Todos los días cargo manualmente los datos en una planilla, luego los cruzo con las OC..."></textarea>
+          <div class="err" id="e-proceso">Describí el proceso aunque sea brevemente.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Con qué frecuencia se hace?</label>
+          <div class="grid2" id="g-frecuencia">
+            <div class="chip2" data-v="Varias veces al día">Varias veces al día</div>
+            <div class="chip2" data-v="Una vez al día">Una vez al día</div>
+            <div class="chip2" data-v="Semanal">Semanal</div>
+            <div class="chip2" data-v="Mensual o esporádico">Mensual o esporádico</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Cuánto tiempo consume?</label>
+          <div class="chip-row" id="g-tiempo">
+            <div class="chip-pill" data-v="Menos de 30 min">Menos de 30 min</div>
+            <div class="chip-pill" data-v="30 min – 1 hora">30 min – 1 hora</div>
+            <div class="chip-pill" data-v="1 a 3 horas">1 a 3 horas</div>
+            <div class="chip-pill" data-v="Más de 3 horas">Más de 3 horas</div>
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(2)">← Atrás</button>
+          <button class="f-btn-next" onclick="next(2)">Siguiente →</button>
+        </div>
       </div>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(6)">← Atrás</button>
-      <button class="btn-next" onclick="next(6)">Siguiente →</button>
+
+      <!-- PASO 3 -->
+      <div class="step-block" id="s3">
+        <div class="section-tag">El impacto</div>
+        <div class="step-q">¿Qué problemas genera este proceso hoy?</div>
+        <div class="step-hint">Marcá todo lo que aplique</div>
+        <div class="field-group">
+          <div class="chip-row" id="g-problemas">
+            <div class="chip-pill" data-v="Errores frecuentes">Errores frecuentes</div>
+            <div class="chip-pill" data-v="Demoras / cuellos de botella">Demoras / cuellos de botella</div>
+            <div class="chip-pill" data-v="Datos inconsistentes">Datos inconsistentes</div>
+            <div class="chip-pill" data-v="Falta de visibilidad">Falta de visibilidad</div>
+            <div class="chip-pill" data-v="Depende de una sola persona">Depende de una sola persona</div>
+            <div class="chip-pill" data-v="Alto consumo de tiempo">Alto consumo de tiempo</div>
+            <div class="chip-pill" data-v="No hay registro formal">No hay registro formal</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Alguna estimación del impacto? (opcional)</label>
+          <input type="text" id="f-impacto" placeholder="Ej: 2 horas por día, 1 error por semana..." />
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(3)">← Atrás</button>
+          <button class="f-btn-next" onclick="next(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="step-block" id="s4">
+        <div class="section-tag">La solución</div>
+        <div class="step-q">¿Cómo sería el mundo ideal?</div>
+        <div class="step-hint">Si el asistente funcionara perfecto, ¿qué cambiaría en tu trabajo?</div>
+        <div class="field-group">
+          <label class="field-label">Resultado esperado</label>
+          <textarea id="f-resultado" placeholder="Ej: Que el reporte se genere solo, que me llegue una alerta cuando falta algo..."></textarea>
+          <div class="err" id="e-resultado">Contanos aunque sea una idea general.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Qué tipo de asistente necesitás?</label>
+          <div class="grid2" id="g-tipo">
+            <div class="chip2" data-v="Análisis y reportes automáticos">Análisis y reportes</div>
+            <div class="chip2" data-v="Registro automático de datos">Registro automático</div>
+            <div class="chip2" data-v="Alertas y notificaciones">Alertas y notificaciones</div>
+            <div class="chip2" data-v="Evaluación o scoring">Evaluación / scoring</div>
+            <div class="chip2" data-v="Generación de mensajes">Generación de mensajes</div>
+            <div class="chip2" data-v="No sé aún">No sé aún</div>
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(4)">← Atrás</button>
+          <button class="f-btn-next" onclick="next(4)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 5 -->
+      <div class="step-block" id="s5">
+        <div class="section-tag">Herramientas</div>
+        <div class="step-q">¿Con qué herramientas trabaja tu área?</div>
+        <div class="step-hint">Marcá las que usás habitualmente</div>
+        <div class="field-group">
+          <div class="chip-row" id="g-herramientas">
+            <div class="chip-pill" data-v="Excel / Google Sheets">Excel / Google Sheets</div>
+            <div class="chip-pill" data-v="Odoo">Odoo</div>
+            <div class="chip-pill" data-v="WhatsApp">WhatsApp</div>
+            <div class="chip-pill" data-v="Email / Gmail">Email / Gmail</div>
+            <div class="chip-pill" data-v="App interna Balcami">App interna Balcami</div>
+            <div class="chip-pill" data-v="ClickUp">ClickUp</div>
+            <div class="chip-pill" data-v="Google Drive">Google Drive</div>
+            <div class="chip-pill" data-v="n8n">n8n</div>
+            <div class="chip-pill" data-v="Otra">Otra</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Cuántas personas usarían este asistente?</label>
+          <div class="chip-row" id="g-usuarios">
+            <div class="chip-pill" data-v="Solo yo">Solo yo</div>
+            <div class="chip-pill" data-v="2 a 5 personas">2 a 5 personas</div>
+            <div class="chip-pill" data-v="6 a 15 personas">6 a 15 personas</div>
+            <div class="chip-pill" data-v="Más de 15 personas">Más de 15 personas</div>
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(5)">← Atrás</button>
+          <button class="f-btn-next" onclick="next(5)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 6 -->
+      <div class="step-block" id="s6">
+        <div class="section-tag">Priorización</div>
+        <div class="step-q">¿Qué tan urgente es esta necesidad?</div>
+        <div class="step-hint">Esto nos ayuda a organizar el backlog de desarrollo</div>
+        <div class="field-group">
+          <label class="field-label">Prioridad</label>
+          <div class="prio-grid">
+            <button class="prio-btn" data-v="Alta" onclick="setPrio(this,'alta')">🔴 ALTA</button>
+            <button class="prio-btn" data-v="Media" onclick="setPrio(this,'media')">🟡 MEDIA</button>
+            <button class="prio-btn" data-v="Baja" onclick="setPrio(this,'baja')">🟢 BAJA</button>
+          </div>
+          <div class="err" id="e-prioridad">Seleccioná una prioridad.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Ya existe algún intento de solución anterior?</label>
+          <div class="chip-row" id="g-previo">
+            <div class="chip-pill" data-v="No, es nuevo">No, es nuevo</div>
+            <div class="chip-pill" data-v="Hay algo manual pero no funciona bien">Hay algo manual</div>
+            <div class="chip-pill" data-v="Se intentó antes y no prosperó">Se intentó antes</div>
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(6)">← Atrás</button>
+          <button class="f-btn-next" onclick="next(6)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 7 -->
+      <div class="step-block" id="s7">
+        <div class="section-tag">Revisión y envío</div>
+        <div class="step-q">Revisá tu solicitud</div>
+        <div class="step-hint">Confirmá que todo esté bien antes de enviar</div>
+        <div class="sheets-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#6ee7b7" stroke-width="2"/><path d="M3 9h18M9 9v12" stroke="#6ee7b7" stroke-width="2"/></svg>
+          Se guardará en Google Sheets vía n8n
+        </div>
+        <div class="summary-card" id="summaryBox"></div>
+        <div class="field-group">
+          <label class="field-label">¿Algo más que quieras agregar? (opcional)</label>
+          <textarea id="f-notas" placeholder="Restricciones, contexto adicional, ideas..."></textarea>
+        </div>
+        <div class="nav-row">
+          <button class="f-btn-back" onclick="back(7)">← Editar</button>
+          <button class="f-btn-submit" onclick="submit()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Enviar solicitud
+          </button>
+        </div>
+      </div>
+
+      <!-- ENVIANDO -->
+      <div class="step-block" id="sSending">
+        <div class="sending-state">
+          <div class="spinner"></div>
+          <div class="sending-title">Enviando tu solicitud...</div>
+          <div class="sending-sub">Conectando con n8n → Google Sheets</div>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success-wrap" id="successBlock">
+        <div class="success-icon">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M6 14L11 19L22 8" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="success-title">¡Solicitud registrada!</div>
+        <div class="success-desc">Tu requerimiento fue guardado en Google Sheets.<br>El área de IA Interna de KYRO te contactará pronto.</div>
+        <div class="summary-card" id="successSummary"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
+          <button class="f-btn-next" onclick="restart()" style="display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0114.7-3.7M20 15a9 9 0 01-14.7 3.7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            Nueva solicitud
+          </button>
+        </div>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-wrap" id="errorBlock">
+        <div class="error-title">No se pudo conectar</div>
+        <div class="error-desc" id="errorDetail">Verificá que el workflow de n8n esté activo.</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="retry-btn" onclick="retrySubmit()">Reintentar</button>
+          <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
+        </div>
+      </div>
+
     </div>
   </div>
-
-  <!-- PASO 7 -->
-  <div class="step-block" id="s7">
-    <div class="section-tag">Revisión y envío</div>
-    <div class="step-q">Revisá tu solicitud</div>
-    <div class="step-hint">Confirmá que todo esté bien antes de enviar</div>
-    <div class="sheets-badge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#6ee7b7" stroke-width="2"/><path d="M3 9h18M9 9v12" stroke="#6ee7b7" stroke-width="2"/></svg>
-      Se guardará en Google Sheets vía n8n
-    </div>
-    <div class="summary-card" id="summaryBox"></div>
-    <div class="field-group">
-      <label class="field-label">¿Algo más que quieras agregar? (opcional)</label>
-      <textarea id="f-notas" placeholder="Restricciones, contexto adicional, ideas, lo que sea..."></textarea>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="back(7)">← Editar</button>
-      <button class="btn-submit" onclick="submit()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Enviar solicitud
-      </button>
-    </div>
-  </div>
-
-  <!-- ENVIANDO -->
-  <div class="step-block" id="sSending">
-    <div class="sending-state">
-      <div class="spinner"></div>
-      <div class="sending-title">Enviando tu solicitud...</div>
-      <div class="sending-sub">Conectando con n8n → Google Sheets</div>
-    </div>
-  </div>
-
-  <!-- SUCCESS -->
-  <div class="success-wrap" id="successBlock">
-    <div class="success-icon">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14L11 19L22 8" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="success-title">¡Solicitud registrada!</div>
-    <div class="success-desc">Tu requerimiento fue guardado en Google Sheets.<br>El área de IA Interna te contactará pronto.</div>
-    <div class="summary-card" id="successSummary"></div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
-      <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
-      <button class="btn-next" onclick="restart()" style="display:flex;align-items:center;gap:8px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 018-8v2m0-2l3 3-3 3M20 12a8 8 0 01-8 8v-2m0 2l-3-3 3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Nueva solicitud
-      </button>
-    </div>
-  </div>
-
-  <!-- ERROR -->
-  <div class="error-wrap" id="errorBlock">
-    <div class="error-icon">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 8v8M14 20v1" stroke="#fc8181" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-    <div class="error-title">No se pudo conectar</div>
-    <div class="error-desc" id="errorDetail">Verificá que el workflow de n8n esté activo.</div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <button class="retry-btn" onclick="retrySubmit()">Reintentar</button>
-      <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
-    </div>
-  </div>
-
 </div>
 
 <script>
-  // ⚙️ CONFIGURACIÓN — cambiá esta URL por la de producción cuando estés listo
   const N8N_URL = 'https://balcami.n8n.heybraian.com/webhook/solicitud-asistente-ia';
-  // Para pruebas usá: /webhook-test/...
-  // Para producción usá: /webhook/...
-
   const TOTAL = 7;
   const D = {};
+
+  function openForm() {
+    document.getElementById('formModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeForm() {
+    document.getElementById('formModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('formModal').addEventListener('click', function(e) {
+    if (e.target === this) closeForm();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeForm();
+  });
 
   function genID() { return 'BAL-' + Date.now().toString(36).toUpperCase(); }
 
@@ -443,6 +1043,7 @@
     document.getElementById('s'+step).classList.remove('active');
     document.getElementById('s'+(step+1)).classList.add('active');
     updateProgress(step + 1);
+    document.querySelector('.modal-inner').scrollTop = 0;
   }
 
   function back(step) {
@@ -462,35 +1063,25 @@
     const html = rows.map(([k,v]) =>
       `<div class="srow"><span class="sk">${k}</span><span class="sv">${v}</span></div>`
     ).join('') +
-    `<div class="srow"><span class="sk">Proceso</span><span class="sv">${(D['Proceso']||'').slice(0,120)}${(D['Proceso']||'').length>120?'…':''}</span></div>` +
-    `<div class="srow"><span class="sk">Resultado</span><span class="sv">${(D['Resultado esperado']||'').slice(0,120)}${(D['Resultado esperado']||'').length>120?'…':''}</span></div>`;
+    `<div class="srow"><span class="sk">Proceso</span><span class="sv" style="font-size:11px;">${(D['Proceso']||'').slice(0,100)}${(D['Proceso']||'').length>100?'…':''}</span></div>` +
+    `<div class="srow"><span class="sk">Resultado</span><span class="sv" style="font-size:11px;">${(D['Resultado esperado']||'').slice(0,100)}${(D['Resultado esperado']||'').length>100?'…':''}</span></div>`;
     document.getElementById('summaryBox').innerHTML = html;
     document.getElementById('successSummary').innerHTML = html;
   }
 
   async function sendToN8N() {
     const payload = {
-      ID: genID(),
-      Fecha: new Date().toLocaleString('es-AR'),
-      Nombre: D['Nombre'] || '',
-      Rol: D['Rol'] || '',
-      Área: D['Área'] || '',
-      Proceso: D['Proceso'] || '',
-      Frecuencia: D['Frecuencia'] || '',
-      Problemas: D['Problemas'] || '',
-      'Tiempo perdido': D['Tiempo perdido'] || '',
-      Herramientas: D['Herramientas'] || '',
-      'Tipo de datos': D['Tipo de datos'] || '',
-      'Resultado esperado': D['Resultado esperado'] || '',
-      Usuarios: D['Usuarios'] || '',
-      Urgencia: D['Urgencia'] || '',
-      'Intentos previos': D['Intentos previos'] || '',
-      'Impacto estimado': D['Impacto estimado'] || '',
-      Notas: D['Notas'] || ''
+      ID: genID(), Fecha: new Date().toLocaleString('es-AR'),
+      Nombre: D['Nombre']||'', Rol: D['Rol']||'', Área: D['Área']||'',
+      Proceso: D['Proceso']||'', Frecuencia: D['Frecuencia']||'',
+      Problemas: D['Problemas']||'', 'Tiempo perdido': D['Tiempo perdido']||'',
+      Herramientas: D['Herramientas']||'', 'Tipo de datos': D['Tipo de datos']||'',
+      'Resultado esperado': D['Resultado esperado']||'', Usuarios: D['Usuarios']||'',
+      Urgencia: D['Urgencia']||'', 'Intentos previos': D['Intentos previos']||'',
+      'Impacto estimado': D['Impacto estimado']||'', Notas: D['Notas']||''
     };
     const res = await fetch(N8N_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -535,23 +1126,19 @@
   }
 
   function restart() {
-    // Reset estado
     Object.keys(D).forEach(k => delete D[k]);
-    // Limpiar inputs
     document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
     document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
     document.querySelectorAll('.chip2.sel, .chip-pill.sel').forEach(el => el.classList.remove('sel'));
     document.querySelectorAll('.prio-btn').forEach(el => el.className = 'prio-btn');
-    // Ocultar success
     document.getElementById('successBlock').style.display = 'none';
-    // Mostrar paso 1
     document.getElementById('s1').classList.add('active');
     updateProgress(1);
   }
 
   function copySummary() {
     const lines = [
-      'SOLICITUD META-AGENTE — BALCAMI IA INTERNA',
+      'SOLICITUD KYRO — BALCAMI IA INTERNA',
       'Fecha: ' + new Date().toLocaleString('es-AR'),
       'Solicitante: ' + (D['Nombre']||''), 'Área: ' + (D['Área']||''), 'Rol: ' + (D['Rol']||''),
       'Proceso: ' + (D['Proceso']||''), 'Frecuencia: ' + (D['Frecuencia']||''),
@@ -560,7 +1147,6 @@
       'Usuarios: ' + (D['Usuarios']||''), 'Urgencia: ' + (D['Urgencia']||''),
       'Intentos previos: ' + (D['Intentos previos']||''),
       'Resultado esperado: ' + (D['Resultado esperado']||''),
-      'Impacto estimado: ' + (D['Impacto estimado']||''),
       'Notas: ' + (D['Notas']||''),
     ];
     navigator.clipboard.writeText(lines.join('\n')).catch(()=>{});
