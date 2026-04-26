@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitud de Asistente IA — Balcami</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f1117; color: #e8eaf0; min-height: 100vh; }
+
+    .top-header {
+      background: linear-gradient(135deg, #1a2a6c 0%, #1565c0 60%, #1976d2 100%);
+      padding: 1.5rem 1.75rem 1.75rem;
+      position: relative; overflow: hidden;
+    }
+    .top-header::before {
+      content: ''; position: absolute; top: -40px; right: -40px;
+      width: 180px; height: 180px; background: rgba(255,255,255,0.06); border-radius: 50%;
+    }
+    .badge { display: inline-block; background: rgba(255,255,255,0.18); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; padding: 4px 10px; border-radius: 4px; margin-bottom: 0.75rem; }
+    .header-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .header-sub { font-size: 13px; color: rgba(255,255,255,0.72); margin-bottom: 1.25rem; }
+    .progress-wrap { display: flex; align-items: center; gap: 10px; }
+    .progress-track { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width 0.4s ease; }
+    .progress-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); white-space: nowrap; }
+
+    .body { padding: 1.75rem 1.75rem 2.5rem; background: #161b27; min-height: calc(100vh - 160px); max-width: 640px; margin: 0 auto; }
+
+    .step-block { display: none; }
+    .step-block.active { display: block; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #5b9bd5; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .step-q { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; }
+    .step-hint { font-size: 13px; color: #8892a4; margin-bottom: 1.5rem; line-height: 1.5; }
+    .field-label { font-size: 13px; font-weight: 600; color: #c8cfdc; display: block; margin-bottom: 8px; }
+    .field-group { margin-bottom: 1.4rem; }
+
+    input[type="text"], textarea, select {
+      width: 100%; background: #1e2535; border: 1px solid #2e3a50; border-radius: 8px;
+      color: #e8eaf0; font-family: 'Inter', sans-serif; font-size: 14px;
+      padding: 11px 14px; outline: none; transition: border-color 0.2s;
+    }
+    input[type="text"]::placeholder, textarea::placeholder { color: #4a5568; }
+    input[type="text"]:focus, textarea:focus, select:focus { border-color: #3b82f6; }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    select { appearance: none; cursor: pointer; }
+    select option { background: #1e2535; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chip2 { padding: 12px 14px; background: #1e2535; border: 1px solid #2e3a50; border-radius: 8px; font-size: 13px; font-weight: 500; color: #c8cfdc; cursor: pointer; transition: all 0.15s; text-align: left; user-select: none; }
+    .chip2:hover { border-color: #3b82f6; color: #fff; }
+    .chip2.sel { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; font-weight: 600; }
+
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip-pill { padding: 8px 16px; background: #1e2535; border: 1px solid #2e3a50; border-radius: 20px; font-size: 13px; color: #c8cfdc; cursor: pointer; transition: all 0.15s; user-select: none; }
+    .chip-pill:hover { border-color: #3b82f6; color: #fff; }
+    .chip-pill.sel { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; font-weight: 600; }
+
+    .prio-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .prio-btn { padding: 12px; border-radius: 8px; border: 1px solid #2e3a50; background: #1e2535; color: #c8cfdc; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+    .prio-btn.alta { background: #3b1111; border-color: #e53e3e; color: #fc8181; }
+    .prio-btn.media { background: #3b2700; border-color: #d97706; color: #fcd34d; }
+    .prio-btn.baja { background: #0d3322; border-color: #059669; color: #6ee7b7; }
+
+    .nav-row { display: flex; gap: 10px; margin-top: 2rem; align-items: center; }
+    .btn-next { padding: 11px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s; }
+    .btn-next:hover { background: #1e40af; }
+    .btn-back { padding: 11px 18px; background: transparent; color: #8892a4; border: 1px solid #2e3a50; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+    .btn-back:hover { color: #e8eaf0; border-color: #4a5568; }
+    .btn-submit { padding: 11px 28px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px; }
+    .btn-submit:hover { background: #047857; }
+
+    .err { color: #fc8181; font-size: 12px; margin-top: 6px; display: none; }
+
+    .summary-card { background: #1e2535; border: 1px solid #2e3a50; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; }
+    .srow { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #2e3a50; font-size: 13px; gap: 16px; }
+    .srow:last-child { border-bottom: none; }
+    .sk { color: #6b7a99; flex-shrink: 0; }
+    .sv { color: #e8eaf0; font-weight: 500; text-align: right; font-size: 12px; }
+
+    .sending-state { text-align: center; padding: 3rem 1rem; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #2e3a50; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sending-title { font-size: 15px; color: #c8cfdc; font-weight: 600; }
+    .sending-sub { font-size: 13px; color: #6b7a99; margin-top: 6px; }
+
+    .success-wrap { display: none; text-align: center; padding: 2.5rem 1rem; animation: fadeUp 0.4s ease both; }
+    .success-icon { width: 60px; height: 60px; background: #0d3322; border: 2px solid #059669; border-radius: 50%; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .success-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .success-desc { font-size: 13px; color: #8892a4; line-height: 1.7; margin-bottom: 1.5rem; }
+
+    .error-wrap { display: none; text-align: center; padding: 2.5rem 1rem; animation: fadeUp 0.4s ease both; }
+    .error-icon { width: 60px; height: 60px; background: #3b1111; border: 2px solid #e53e3e; border-radius: 50%; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .error-title { font-size: 18px; font-weight: 700; color: #fc8181; margin-bottom: 8px; }
+    .error-desc { font-size: 13px; color: #8892a4; line-height: 1.7; margin-bottom: 1.5rem; }
+
+    .sheets-badge { display: inline-flex; align-items: center; gap: 6px; background: #0d3322; border: 1px solid #059669; border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #6ee7b7; font-weight: 600; margin-bottom: 1rem; }
+    .copy-btn { padding: 9px 22px; border: 1px solid #2e3a50; border-radius: 8px; background: transparent; color: #8892a4; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; margin-top: 10px; }
+    .copy-btn:hover { border-color: #4a5568; color: #e8eaf0; }
+    .retry-btn { padding: 10px 24px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+    @media (max-width: 480px) {
+      .grid2 { grid-template-columns: 1fr; }
+      .prio-grid { grid-template-columns: 1fr; }
+      .body { padding: 1.25rem 1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-header">
+  <div class="badge">BALCAMI</div>
+  <div class="header-title">Solicitud de Asistente IA</div>
+  <div class="header-sub">Completá las preguntas para que podamos diseñar tu solución</div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="pFill" style="width:14.28%"></div></div>
+    <div class="progress-label" id="pLabel">Paso 1 de 7</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- PASO 1 -->
+  <div class="step-block active" id="s1">
+    <div class="section-tag">Identificación</div>
+    <div class="step-q">¿Quién hace la solicitud?</div>
+    <div class="step-hint">Estos datos nos permiten hacer el seguimiento y coordinar la implementación</div>
+    <div class="field-group">
+      <label class="field-label">Nombre completo</label>
+      <input type="text" id="f-nombre" placeholder="Tu nombre" />
+      <div class="err" id="e-nombre">Campo obligatorio.</div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Área / Departamento</label>
+      <div class="grid2" id="g-area">
+        <div class="chip2" data-v="Logística">Logística</div>
+        <div class="chip2" data-v="Administración">Administración</div>
+        <div class="chip2" data-v="Ventas">Ventas</div>
+        <div class="chip2" data-v="Recursos Humanos">Recursos Humanos</div>
+        <div class="chip2" data-v="Post-venta">Post-venta</div>
+        <div class="chip2" data-v="Dirección">Dirección</div>
+      </div>
+      <div class="err" id="e-area">Seleccioná al menos un área.</div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Rol dentro del área</label>
+      <select id="f-rol">
+        <option value="">Ej: Analista, Líder de área, Operario...</option>
+        <option>Operario</option>
+        <option>Analista</option>
+        <option>Líder de área</option>
+        <option>Jefe / Supervisor</option>
+        <option>Dirección / Gerencia</option>
+        <option>Otro</option>
+      </select>
+      <div class="err" id="e-rol">Seleccioná tu rol.</div>
+    </div>
+    <div class="nav-row"><button class="btn-next" onclick="next(1)">Siguiente →</button></div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="step-block" id="s2">
+    <div class="section-tag">El problema</div>
+    <div class="step-q">¿Qué tarea o proceso querés automatizar?</div>
+    <div class="step-hint">Describilo como lo hacés hoy, sin pensar aún en la solución técnica</div>
+    <div class="field-group">
+      <label class="field-label">Descripción del proceso actual</label>
+      <textarea id="f-proceso" placeholder="Ej: Todos los días cargo manualmente los datos de recepciones en una planilla, luego los cruzo con las OC..."></textarea>
+      <div class="err" id="e-proceso">Describí el proceso aunque sea brevemente.</div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Con qué frecuencia se hace?</label>
+      <div class="grid2" id="g-frecuencia">
+        <div class="chip2" data-v="Varias veces al día">Varias veces al día</div>
+        <div class="chip2" data-v="Una vez al día">Una vez al día</div>
+        <div class="chip2" data-v="Semanal">Semanal</div>
+        <div class="chip2" data-v="Mensual o esporádico">Mensual o esporádico</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Cuánto tiempo consume?</label>
+      <div class="chip-row" id="g-tiempo">
+        <div class="chip-pill" data-v="Menos de 30 min">Menos de 30 min</div>
+        <div class="chip-pill" data-v="30 min – 1 hora">30 min – 1 hora</div>
+        <div class="chip-pill" data-v="1 a 3 horas">1 a 3 horas</div>
+        <div class="chip-pill" data-v="Más de 3 horas">Más de 3 horas</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(2)">← Atrás</button>
+      <button class="btn-next" onclick="next(2)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="step-block" id="s3">
+    <div class="section-tag">El impacto actual</div>
+    <div class="step-q">¿Qué problemas genera este proceso hoy?</div>
+    <div class="step-hint">Marcá todo lo que aplique</div>
+    <div class="field-group">
+      <div class="chip-row" id="g-problemas">
+        <div class="chip-pill" data-v="Errores frecuentes">Errores frecuentes</div>
+        <div class="chip-pill" data-v="Demoras / cuellos de botella">Demoras / cuellos de botella</div>
+        <div class="chip-pill" data-v="Datos inconsistentes">Datos inconsistentes</div>
+        <div class="chip-pill" data-v="Falta de visibilidad">Falta de visibilidad</div>
+        <div class="chip-pill" data-v="Depende de una sola persona">Depende de una sola persona</div>
+        <div class="chip-pill" data-v="Alto consumo de tiempo">Alto consumo de tiempo</div>
+        <div class="chip-pill" data-v="No hay registro formal">No hay registro formal</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Tenés alguna estimación del impacto? (opcional)</label>
+      <input type="text" id="f-impacto" placeholder="Ej: 2 horas por día, 1 error por semana..." />
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(3)">← Atrás</button>
+      <button class="btn-next" onclick="next(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="step-block" id="s4">
+    <div class="section-tag">La solución deseada</div>
+    <div class="step-q">¿Cómo sería el mundo ideal?</div>
+    <div class="step-hint">Si el asistente funcionara perfecto, ¿qué cambiaría en tu trabajo?</div>
+    <div class="field-group">
+      <label class="field-label">Resultado esperado</label>
+      <textarea id="f-resultado" placeholder="Ej: Que el reporte se genere solo, que me llegue una alerta cuando falta algo..."></textarea>
+      <div class="err" id="e-resultado">Contanos aunque sea una idea general.</div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Qué tipo de asistente necesitás?</label>
+      <div class="grid2" id="g-tipo">
+        <div class="chip2" data-v="Análisis y reportes automáticos">Análisis y reportes automáticos</div>
+        <div class="chip2" data-v="Registro automático de datos">Registro automático de datos</div>
+        <div class="chip2" data-v="Alertas y notificaciones">Alertas y notificaciones</div>
+        <div class="chip2" data-v="Evaluación o scoring">Evaluación o scoring</div>
+        <div class="chip2" data-v="Generación de mensajes">Generación de mensajes</div>
+        <div class="chip2" data-v="No sé aún">No sé aún</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(4)">← Atrás</button>
+      <button class="btn-next" onclick="next(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 5 -->
+  <div class="step-block" id="s5">
+    <div class="section-tag">Herramientas y contexto</div>
+    <div class="step-q">¿Con qué herramientas trabaja tu área?</div>
+    <div class="step-hint">Marcá las que usás habitualmente</div>
+    <div class="field-group">
+      <div class="chip-row" id="g-herramientas">
+        <div class="chip-pill" data-v="Excel / Google Sheets">Excel / Google Sheets</div>
+        <div class="chip-pill" data-v="Odoo">Odoo</div>
+        <div class="chip-pill" data-v="WhatsApp">WhatsApp</div>
+        <div class="chip-pill" data-v="Email / Gmail">Email / Gmail</div>
+        <div class="chip-pill" data-v="App interna Balcami">App interna Balcami</div>
+        <div class="chip-pill" data-v="ClickUp">ClickUp</div>
+        <div class="chip-pill" data-v="Google Drive">Google Drive</div>
+        <div class="chip-pill" data-v="n8n">n8n</div>
+        <div class="chip-pill" data-v="Otra">Otra</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Cuántas personas usarían este asistente?</label>
+      <div class="chip-row" id="g-usuarios">
+        <div class="chip-pill" data-v="Solo yo">Solo yo</div>
+        <div class="chip-pill" data-v="2 a 5 personas">2 a 5 personas</div>
+        <div class="chip-pill" data-v="6 a 15 personas">6 a 15 personas</div>
+        <div class="chip-pill" data-v="Más de 15 personas">Más de 15 personas</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(5)">← Atrás</button>
+      <button class="btn-next" onclick="next(5)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 6 -->
+  <div class="step-block" id="s6">
+    <div class="section-tag">Priorización</div>
+    <div class="step-q">¿Qué tan urgente es esta necesidad?</div>
+    <div class="step-hint">Esto nos ayuda a organizar el backlog de desarrollo</div>
+    <div class="field-group">
+      <label class="field-label">Prioridad</label>
+      <div class="prio-grid">
+        <button class="prio-btn" data-v="Alta" onclick="setPrio(this,'alta')">🔴 ALTA</button>
+        <button class="prio-btn" data-v="Media" onclick="setPrio(this,'media')">🟡 MEDIA</button>
+        <button class="prio-btn" data-v="Baja" onclick="setPrio(this,'baja')">🟢 BAJA</button>
+      </div>
+      <div class="err" id="e-prioridad">Seleccioná una prioridad.</div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">¿Ya existe algún intento de solución anterior?</label>
+      <div class="chip-row" id="g-previo">
+        <div class="chip-pill" data-v="No, es nuevo">No, es nuevo</div>
+        <div class="chip-pill" data-v="Hay algo manual pero no funciona bien">Hay algo manual</div>
+        <div class="chip-pill" data-v="Se intentó antes y no prosperó">Se intentó antes</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(6)">← Atrás</button>
+      <button class="btn-next" onclick="next(6)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 7 -->
+  <div class="step-block" id="s7">
+    <div class="section-tag">Revisión y envío</div>
+    <div class="step-q">Revisá tu solicitud</div>
+    <div class="step-hint">Confirmá que todo esté bien antes de enviar</div>
+    <div class="sheets-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#6ee7b7" stroke-width="2"/><path d="M3 9h18M9 9v12" stroke="#6ee7b7" stroke-width="2"/></svg>
+      Se guardará en Google Sheets vía n8n
+    </div>
+    <div class="summary-card" id="summaryBox"></div>
+    <div class="field-group">
+      <label class="field-label">¿Algo más que quieras agregar? (opcional)</label>
+      <textarea id="f-notas" placeholder="Restricciones, contexto adicional, ideas, lo que sea..."></textarea>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(7)">← Editar</button>
+      <button class="btn-submit" onclick="submit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Enviar solicitud
+      </button>
+    </div>
+  </div>
+
+  <!-- ENVIANDO -->
+  <div class="step-block" id="sSending">
+    <div class="sending-state">
+      <div class="spinner"></div>
+      <div class="sending-title">Enviando tu solicitud...</div>
+      <div class="sending-sub">Conectando con n8n → Google Sheets</div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-wrap" id="successBlock">
+    <div class="success-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14L11 19L22 8" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="success-title">¡Solicitud registrada!</div>
+    <div class="success-desc">Tu requerimiento fue guardado en Google Sheets.<br>El área de IA Interna te contactará pronto.</div>
+    <div class="summary-card" id="successSummary"></div>
+    <button class="copy-btn" onclick="copySummary()">Copiar resumen al portapapeles</button>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-wrap" id="errorBlock">
+    <div class="error-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 8v8M14 20v1" stroke="#fc8181" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="error-title">No se pudo conectar</div>
+    <div class="error-desc" id="errorDetail">Verificá que el workflow de n8n esté activo.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="retry-btn" onclick="retrySubmit()">Reintentar</button>
+      <button class="copy-btn" onclick="copySummary()">Copiar resumen</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ⚙️ CONFIGURACIÓN — cambiá esta URL por la de producción cuando estés listo
+  const N8N_URL = 'https://balcami.n8n.heybraian.com/webhook/solicitud-asistente-ia';
+  // Para pruebas usá: /webhook-test/...
+  // Para producción usá: /webhook/...
+
+  const TOTAL = 7;
+  const D = {};
+
+  function genID() { return 'BAL-' + Date.now().toString(36).toUpperCase(); }
+
+  function chips(gid) {
+    return [...document.querySelectorAll('#'+gid+' .chip2.sel, #'+gid+' .chip-pill.sel')].map(c => c.dataset.v);
+  }
+
+  document.querySelectorAll('.chip2, .chip-pill').forEach(c => {
+    c.addEventListener('click', () => c.classList.toggle('sel'));
+  });
+
+  function setPrio(btn, cls) {
+    document.querySelectorAll('.prio-btn').forEach(b => b.className = 'prio-btn');
+    btn.classList.add(cls);
+    D.Urgencia = btn.dataset.v;
+  }
+
+  function showErr(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
+
+  function updateProgress(step) {
+    document.getElementById('pFill').style.width = (step/TOTAL*100) + '%';
+    document.getElementById('pLabel').textContent = 'Paso ' + step + ' de ' + TOTAL;
+  }
+
+  function next(step) {
+    let ok = true;
+    if (step === 1) {
+      const n = document.getElementById('f-nombre').value.trim();
+      const a = chips('g-area');
+      const r = document.getElementById('f-rol').value;
+      if (!n) { showErr('e-nombre', true); ok = false; } else showErr('e-nombre', false);
+      if (!a.length) { showErr('e-area', true); ok = false; } else showErr('e-area', false);
+      if (!r) { showErr('e-rol', true); ok = false; } else showErr('e-rol', false);
+      if (ok) { D['Nombre'] = n; D['Área'] = a.join(', '); D['Rol'] = r; }
+    }
+    if (step === 2) {
+      const p = document.getElementById('f-proceso').value.trim();
+      if (!p) { showErr('e-proceso', true); ok = false; } else showErr('e-proceso', false);
+      if (ok) { D['Proceso'] = p; D['Frecuencia'] = chips('g-frecuencia').join(', '); D['Tiempo perdido'] = chips('g-tiempo').join(', '); }
+    }
+    if (step === 3) {
+      D['Problemas'] = chips('g-problemas').join(', ');
+      D['Impacto estimado'] = document.getElementById('f-impacto').value.trim();
+    }
+    if (step === 4) {
+      const r = document.getElementById('f-resultado').value.trim();
+      if (!r) { showErr('e-resultado', true); ok = false; } else showErr('e-resultado', false);
+      if (ok) { D['Resultado esperado'] = r; D['Tipo de datos'] = chips('g-tipo').join(', '); }
+    }
+    if (step === 5) {
+      D['Herramientas'] = chips('g-herramientas').join(', ');
+      D['Usuarios'] = chips('g-usuarios').join(', ');
+    }
+    if (step === 6) {
+      if (!D.Urgencia) { showErr('e-prioridad', true); ok = false; } else showErr('e-prioridad', false);
+      if (ok) { D['Intentos previos'] = chips('g-previo').join(', '); buildSummary(); }
+    }
+    if (!ok) return;
+    if (step === TOTAL) return;
+    document.getElementById('s'+step).classList.remove('active');
+    document.getElementById('s'+(step+1)).classList.add('active');
+    updateProgress(step + 1);
+  }
+
+  function back(step) {
+    document.getElementById('s'+step).classList.remove('active');
+    document.getElementById('s'+(step-1)).classList.add('active');
+    updateProgress(step - 1);
+  }
+
+  function buildSummary() {
+    const rows = [
+      ['Solicitante', D['Nombre']||'—'], ['Área', D['Área']||'—'], ['Rol', D['Rol']||'—'],
+      ['Frecuencia', D['Frecuencia']||'—'], ['Tiempo', D['Tiempo perdido']||'—'],
+      ['Problemas', D['Problemas']||'—'], ['Tipo', D['Tipo de datos']||'—'],
+      ['Herramientas', D['Herramientas']||'—'], ['Usuarios', D['Usuarios']||'—'],
+      ['Urgencia', D['Urgencia']||'—'], ['Intento previo', D['Intentos previos']||'—'],
+    ];
+    const html = rows.map(([k,v]) =>
+      `<div class="srow"><span class="sk">${k}</span><span class="sv">${v}</span></div>`
+    ).join('') +
+    `<div class="srow"><span class="sk">Proceso</span><span class="sv">${(D['Proceso']||'').slice(0,120)}${(D['Proceso']||'').length>120?'…':''}</span></div>` +
+    `<div class="srow"><span class="sk">Resultado</span><span class="sv">${(D['Resultado esperado']||'').slice(0,120)}${(D['Resultado esperado']||'').length>120?'…':''}</span></div>`;
+    document.getElementById('summaryBox').innerHTML = html;
+    document.getElementById('successSummary').innerHTML = html;
+  }
+
+  async function sendToN8N() {
+    const payload = {
+      ID: genID(),
+      Fecha: new Date().toLocaleString('es-AR'),
+      Nombre: D['Nombre'] || '',
+      Rol: D['Rol'] || '',
+      Área: D['Área'] || '',
+      Proceso: D['Proceso'] || '',
+      Frecuencia: D['Frecuencia'] || '',
+      Problemas: D['Problemas'] || '',
+      'Tiempo perdido': D['Tiempo perdido'] || '',
+      Herramientas: D['Herramientas'] || '',
+      'Tipo de datos': D['Tipo de datos'] || '',
+      'Resultado esperado': D['Resultado esperado'] || '',
+      Usuarios: D['Usuarios'] || '',
+      Urgencia: D['Urgencia'] || '',
+      'Intentos previos': D['Intentos previos'] || '',
+      'Impacto estimado': D['Impacto estimado'] || '',
+      Notas: D['Notas'] || ''
+    };
+    const res = await fetch(N8N_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return true;
+  }
+
+  async function submit() {
+    D['Notas'] = document.getElementById('f-notas').value.trim();
+    buildSummary();
+    document.getElementById('s7').classList.remove('active');
+    document.getElementById('sSending').classList.add('active');
+    document.getElementById('pFill').style.width = '95%';
+    document.getElementById('pLabel').textContent = 'Enviando...';
+    try {
+      await sendToN8N();
+      document.getElementById('sSending').classList.remove('active');
+      document.getElementById('successBlock').style.display = 'block';
+      document.getElementById('pFill').style.width = '100%';
+      document.getElementById('pLabel').textContent = 'Completado ✓';
+    } catch(err) {
+      document.getElementById('sSending').classList.remove('active');
+      document.getElementById('errorBlock').style.display = 'block';
+      document.getElementById('errorDetail').textContent = 'Error: ' + err.message;
+      document.getElementById('pLabel').textContent = 'Error al enviar';
+    }
+  }
+
+  async function retrySubmit() {
+    document.getElementById('errorBlock').style.display = 'none';
+    document.getElementById('sSending').classList.add('active');
+    try {
+      await sendToN8N();
+      document.getElementById('sSending').classList.remove('active');
+      document.getElementById('successBlock').style.display = 'block';
+      document.getElementById('pFill').style.width = '100%';
+      document.getElementById('pLabel').textContent = 'Completado ✓';
+    } catch(err) {
+      document.getElementById('sSending').classList.remove('active');
+      document.getElementById('errorBlock').style.display = 'block';
+      document.getElementById('errorDetail').textContent = 'Error: ' + err.message;
+    }
+  }
+
+  function copySummary() {
+    const lines = [
+      'SOLICITUD META-AGENTE — BALCAMI IA INTERNA',
+      'Fecha: ' + new Date().toLocaleString('es-AR'),
+      'Solicitante: ' + (D['Nombre']||''), 'Área: ' + (D['Área']||''), 'Rol: ' + (D['Rol']||''),
+      'Proceso: ' + (D['Proceso']||''), 'Frecuencia: ' + (D['Frecuencia']||''),
+      'Tiempo: ' + (D['Tiempo perdido']||''), 'Problemas: ' + (D['Problemas']||''),
+      'Tipo: ' + (D['Tipo de datos']||''), 'Herramientas: ' + (D['Herramientas']||''),
+      'Usuarios: ' + (D['Usuarios']||''), 'Urgencia: ' + (D['Urgencia']||''),
+      'Intentos previos: ' + (D['Intentos previos']||''),
+      'Resultado esperado: ' + (D['Resultado esperado']||''),
+      'Impacto estimado: ' + (D['Impacto estimado']||''),
+      'Notas: ' + (D['Notas']||''),
+    ];
+    navigator.clipboard.writeText(lines.join('\n')).catch(()=>{});
+  }
+</script>
+</body>
+</html>
